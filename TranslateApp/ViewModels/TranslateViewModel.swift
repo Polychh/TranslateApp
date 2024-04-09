@@ -9,23 +9,25 @@ import Foundation
 
 final class TranslateViewModel: ObservableObject{
     private let network: NetworkMangerProtocol
-    @Published var dataTranslations: TranslateModel = .init(translations: .init(possibleTranslations: .init()))
+    @Published var dataTranslations: String = .init()
+    @Published var plsceHolderDest: String = .init()
     
     init(network: NetworkMangerProtocol) {
         self.network = network
     }
     
-    func translateWords(){
-        let request = TranslateRequest(sourseLan: "ru", destLan: "en", textToTranslate: "привет")
-        fetchCoctailData(request: request)
+    func translateWords(text: String){
+        print("text \(text)")
+        let request = TranslateRequest(sourseLan: "ru", destLan: "en", textToTranslate: text)
+        text.isEmpty ? plsceHolderDest = "Translate Word" : fetchCoctailData(request: request)
     }
     
     private func fetchCoctailData(request: TranslateRequest){
         Task{ @MainActor in
             do{
                 let dataTranslate = try await network.request(request)
-                dataTranslations = dataTranslate
-                print(dataTranslations)
+                dataTranslations = dataTranslate.translations.possibleTranslations.joined(separator: "\n")
+               // print(dataTranslations)
             } catch{
                 print(error.localizedDescription)
             }

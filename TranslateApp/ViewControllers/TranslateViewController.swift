@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Combine
 
 class TranslateViewController: UIViewController {
     
@@ -20,6 +21,7 @@ class TranslateViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    private var cancellables = Set<AnyCancellable>()
     
     private let backView: UIView = {
         let view = UIView()
@@ -45,6 +47,7 @@ class TranslateViewController: UIViewController {
         textView.font = .systemFont(ofSize: 20, weight: .regular)
         textView.textAlignment = .left
         textView.tag = 1
+        textView.autocorrectionType = .no
         textView.showsVerticalScrollIndicator = false
         return textView
     }()
@@ -66,16 +69,35 @@ class TranslateViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        observeData()
         setConstrains()
         setDelegates()
-        viewModel.translateWords()
     }
     
+    private func observeData(){
+        viewModel.$dataTranslations
+            .dropFirst()
+            .sink { [unowned self] translations in
+                changeColorToBlackPlaceHoler(textView: self.deatinationLanTextView)
+                self.deatinationLanTextView.text = translations
+                
+            }
+            .store(in: &cancellables)
+        
+        viewModel.$plsceHolderDest
+            .dropFirst()
+            .sink { [unowned self] placeholder in
+                self.deatinationLanTextView.textColor = UIColor.lightGray
+                self.deatinationLanTextView.text = placeholder
+            }
+            .store(in: &cancellables)
+        
+    }
     private func setDelegates(){
         sourseLanTextView.delegate = self
     }
     
-    private func changeColorToBlackDeletePlaceHoler(textView: UITextView){
+    private func changeColorToBlackPlaceHoler(textView: UITextView){
         if textView.textColor == UIColor.gray {
             textView.text = ""
             textView.textColor = UIColor.black
@@ -86,13 +108,13 @@ class TranslateViewController: UIViewController {
 // MARK: - UITextViewDelegate
 extension TranslateViewController: UITextViewDelegate{
     func textViewDidBeginEditing(_ textView: UITextView) {
-        changeColorToBlackDeletePlaceHoler(textView: textView)
+        changeColorToBlackPlaceHoler(textView: textView)
     }
     
     func textViewDidChange(_ textView: UITextView) {
         switch textView.tag{
-        case 1: print(textView.text)
-        case 2: break
+        case 1:
+            viewModel.translateWords(text: textView.text)
         default:
             break
         }
