@@ -21,6 +21,7 @@
 		3636EA012BC57F3100B4A287 /* TranslateRequestProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3636EA002BC57F3100B4A287 /* TranslateRequestProtocol.swift */; };
 		3636EA032BC57FC600B4A287 /* TranslateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3636EA022BC57FC600B4A287 /* TranslateRequest.swift */; };
 		3636EA052BC580EE00B4A287 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3636EA042BC580EE00B4A287 /* NetworkManager.swift */; };
+		3636EA082BC59A4F00B4A287 /* BuilderTranslate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3636EA072BC59A4F00B4A287 /* BuilderTranslate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		3636EA002BC57F3100B4A287 /* TranslateRequestProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateRequestProtocol.swift; sourceTree = "<group>"; };
 		3636EA022BC57FC600B4A287 /* TranslateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateRequest.swift; sourceTree = "<group>"; };
 		3636EA042BC580EE00B4A287 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		3636EA072BC59A4F00B4A287 /* BuilderTranslate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuilderTranslate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,9 +74,10 @@
 		3636E9D62BC56DB100B4A287 /* TranslateApp */ = {
 			isa = PBXGroup;
 			children = (
+				3636E9EB2BC56E0500B4A287 /* App */,
+				3636EA062BC59A3900B4A287 /* Builder */,
 				3636E9FB2BC5772100B4A287 /* Helpers */,
 				3636E9F52BC5703F00B4A287 /* Services */,
-				3636E9EB2BC56E0500B4A287 /* App */,
 				3636E9EE2BC56FA000B4A287 /* ViewModels */,
 				3636E9ED2BC56F9800B4A287 /* Models */,
 				3636E9EC2BC56E3500B4A287 /* ViewControllers */,
@@ -135,6 +138,14 @@
 				3636E9FC2BC5773600B4A287 /* ConstColors.swift */,
 			);
 			path = Helpers;
+			sourceTree = "<group>";
+		};
+		3636EA062BC59A3900B4A287 /* Builder */ = {
+			isa = PBXGroup;
+			children = (
+				3636EA072BC59A4F00B4A287 /* BuilderTranslate.swift */,
+			);
+			path = Builder;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -220,6 +231,7 @@
 				3636E9FF2BC57F0900B4A287 /* NetworkError.swift in Sources */,
 				3636E9D82BC56DB100B4A287 /* AppDelegate.swift in Sources */,
 				3636E9F02BC56FC300B4A287 /* TranslateModel.swift in Sources */,
+				3636EA082BC59A4F00B4A287 /* BuilderTranslate.swift in Sources */,
 				3636EA032BC57FC600B4A287 /* TranslateRequest.swift in Sources */,
 				3636E9FD2BC5773600B4A287 /* ConstColors.swift in Sources */,
 				3636E9DA2BC56DB100B4A287 /* SceneDelegate.swift in Sources */,
