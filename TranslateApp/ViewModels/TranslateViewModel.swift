@@ -7,29 +7,50 @@
 
 import Foundation
 
+enum lanType{
+    case source
+    case dest
+}
+
 final class TranslateViewModel: ObservableObject{
-    private let network: NetworkMangerProtocol
+    
     @Published var dataTranslations: String = .init()
-    @Published var plsceHolderDest: String = .init()
+    @Published var placeHolderDest: String = .init()
     
     let languages: [Languages] = Languages.allCases
+    var langDict: [String : String] = ["sl" : "", "dl" : ""]
+    
+    private let network: NetworkMangerProtocol
     
     init(network: NetworkMangerProtocol) {
         self.network = network
+        setUpDefaultLangs()
     }
     
     func translateWords(text: String){
-        print("text \(text)")
-        let request = TranslateRequest(sourseLan: "ru", destLan: "en", textToTranslate: text)
-        text.isEmpty ? plsceHolderDest = "Translate Word" : fetchCoctailData(request: request)
+        let request = TranslateRequest(sourseLan: langDict["sl"] ?? "en", destLan: langDict["dl"] ?? "ru", textToTranslate: text)
+        text.isEmpty ? placeHolderDest = "Translate Word" : fetchCoctailData(request: request)
+    }
+    
+    func changeLanSourseOrDest(type:lanType, newlan: String){
+        switch type{
+        case .source:
+            langDict["sl"] = newlan
+        case .dest:
+            langDict["dl"] = newlan
+        }
+    }
+    
+    private func setUpDefaultLangs(){
+        langDict["sl"] = languages.first?.typeValue
+        langDict["dl"] = languages.last?.typeValue
     }
     
     private func fetchCoctailData(request: TranslateRequest){
         Task{ @MainActor in
             do{
                 let dataTranslate = try await network.request(request)
-                dataTranslations = dataTranslate.translations.possibleTranslations.joined(separator: "\n")
-               // print(dataTranslations)
+                dataTranslations =  dataTranslate.translations.possibleTranslations.joined(separator: "\n")
             } catch{
                 print(error.localizedDescription)
             }
