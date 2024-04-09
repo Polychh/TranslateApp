@@ -12,6 +12,8 @@ final class TranslateViewModel: ObservableObject{
     @Published var dataTranslations: String = .init()
     @Published var plsceHolderDest: String = .init()
     
+    let languages: [Languages] = Languages.allCases
+    
     init(network: NetworkMangerProtocol) {
         self.network = network
     }

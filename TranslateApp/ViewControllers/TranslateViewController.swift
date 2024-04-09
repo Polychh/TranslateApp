@@ -13,6 +13,22 @@ class TranslateViewController: UIViewController {
     
     private let viewModel: TranslateViewModel
     
+    private let languageButtonSource: UIButton = {
+        let button = UIButton()
+        button.layer.cornerRadius = 12
+        button.backgroundColor = ConstColors.lightGreen
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let languageButtonDest: UIButton = {
+        let button = UIButton()
+        button.layer.cornerRadius = 12
+        button.backgroundColor = ConstColors.lightGreen
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     init(viewModel: TranslateViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -72,13 +88,15 @@ class TranslateViewController: UIViewController {
         observeData()
         setConstrains()
         setDelegates()
+        configMenuSource()
+        configMenuDest()
     }
     
     private func observeData(){
         viewModel.$dataTranslations
             .dropFirst()
             .sink { [unowned self] translations in
-                changeColorToBlackPlaceHoler(textView: self.deatinationLanTextView)
+                changeColorPlaceHoler(textView: self.deatinationLanTextView)
                 self.deatinationLanTextView.text = translations
                 
             }
@@ -97,18 +115,54 @@ class TranslateViewController: UIViewController {
         sourseLanTextView.delegate = self
     }
     
-    private func changeColorToBlackPlaceHoler(textView: UITextView){
+    private func changeColorPlaceHoler(textView: UITextView){
         if textView.textColor == UIColor.gray {
             textView.text = ""
-            textView.textColor = UIColor.black
+            textView.textColor = UIColor.white
         }
+    }
+    
+    private func configMenuSource(){
+        let menu = UIMenu(title: "Chose language",children: createMenuChildrenSorce())
+        languageButtonSource.setTitle(viewModel.languages.first?.typeLabel, for: .normal)
+        languageButtonSource.showsMenuAsPrimaryAction = true
+        languageButtonSource.menu = menu
+    
+    }
+    
+    private func configMenuDest(){
+        let menu = UIMenu(title: "Chose language",children: createMenuChildrenDest())
+        languageButtonDest.setTitle(viewModel.languages.last?.typeLabel, for: .normal)
+        languageButtonDest.showsMenuAsPrimaryAction = true
+        languageButtonDest.menu = menu
+    
+    }
+    
+    private func createMenuChildrenDest() -> [UIAction]{
+        var children: [UIAction] = .init()
+        viewModel.languages.forEach { lan in
+            children.append(UIAction(title: lan.typeLabel, handler: { [unowned self] action in
+                self.languageButtonDest.setTitle(action.title, for: .normal)
+            }))
+        }
+        return children
+    }
+    
+    private func createMenuChildrenSorce() -> [UIAction]{
+        var children: [UIAction] = .init()
+        viewModel.languages.forEach { lan in
+            children.append(UIAction(title: lan.typeLabel, handler: { [unowned self] action in
+                self.languageButtonSource.setTitle(action.title, for: .normal)
+            }))
+        }
+        return children
     }
 }
 
 // MARK: - UITextViewDelegate
 extension TranslateViewController: UITextViewDelegate{
     func textViewDidBeginEditing(_ textView: UITextView) {
-        changeColorToBlackPlaceHoler(textView: textView)
+        changeColorPlaceHoler(textView: textView)
     }
     
     func textViewDidChange(_ textView: UITextView) {
@@ -129,8 +183,17 @@ private extension TranslateViewController{
         [
             sourseLanTextView,
             deatinationLanTextView,
+            languageButtonSource,
+            languageButtonDest
             
         ].forEach { backView.addSubview($0) }
+        
+        languageButtonSource.snp.makeConstraints {
+            $0.top.equalTo(backView.snp.top).offset(16)
+            $0.trailing.equalTo(backView.snp.trailing).inset(16)
+            $0.leading.equalTo(backView.snp.leading).inset(16)
+            $0.height.equalTo(30)
+        }
         
         backView.snp.makeConstraints {
             $0.top.bottom.equalTo(view.safeAreaLayoutGuide).inset(32)
@@ -139,7 +202,7 @@ private extension TranslateViewController{
         }
         
         sourseLanTextView.snp.makeConstraints {
-            $0.top.equalTo(backView.snp.top).inset(32)
+            $0.top.equalTo(languageButtonSource.snp.bottom).offset(16)
             $0.trailing.equalTo(backView.snp.trailing).inset(16)
             $0.leading.equalTo(backView.snp.leading).inset(16)
             $0.height.equalTo(220)
@@ -150,6 +213,13 @@ private extension TranslateViewController{
             $0.trailing.equalTo(backView.snp.trailing).inset(16)
             $0.leading.equalTo(backView.snp.leading).inset(16)
             $0.height.equalTo(220)
+        }
+        
+        languageButtonDest.snp.makeConstraints {
+            $0.top.equalTo(deatinationLanTextView.snp.bottom).offset(16)
+            $0.trailing.equalTo(backView.snp.trailing).inset(16)
+            $0.leading.equalTo(backView.snp.leading).inset(16)
+            $0.height.equalTo(30)
         }
         
     }
