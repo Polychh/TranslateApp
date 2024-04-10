@@ -43,11 +43,10 @@ class TranslateViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        congigUi()
         observeData()
+        congigUi()
         setConstrains()
         setDelegates()
-      
     }
     
     private func observeData(){
@@ -65,6 +64,14 @@ class TranslateViewController: UIViewController {
             .sink { [unowned self] placeholder in
                 destinationLanTextView.textColor = .gray
                 destinationLanTextView.text = placeholder
+            }
+            .store(in: &cancellables)
+        
+        viewModel.$langDictLabel
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] dict in
+                languageButtonSource.setTitle(dict[LanType.source.rawValue], for: .normal)
+                languageButtonDest.setTitle(dict[LanType.dest.rawValue], for: .normal)
             }
             .store(in: &cancellables)
         
@@ -92,14 +99,8 @@ private extension TranslateViewController{
         textView.textColor = UIColor.white
     }
     
-    func configMenu(type: lanType, button: UIButton){
+    func configMenu(type: LanType, button: UIButton){
         let menu = UIMenu(title: "Chose language",children: createMenuChildren(type: type, buttonType: button))
-        switch type{
-        case .source:
-            button.setTitle(viewModel.languages.first?.typeLabel, for: .normal)
-        case .dest:
-            button.setTitle(viewModel.languages.last?.typeLabel, for: .normal)
-        }
         button.showsMenuAsPrimaryAction = true
         button.menu = menu
     }
@@ -124,11 +125,10 @@ private extension TranslateViewController{
         button.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    func createMenuChildren(type: lanType, buttonType: UIButton) -> [UIAction]{
+    func createMenuChildren(type: LanType, buttonType: UIButton) -> [UIAction]{
         return viewModel.languages.map { lan in
             UIAction(title: lan.typeLabel, handler: { [unowned self] action in
                 self.viewModel.changeLanSourseOrDest(type: type, newlan: lan.typeValue)
-                buttonType.setTitle(action.title, for: .normal)
             })
         }
     }
