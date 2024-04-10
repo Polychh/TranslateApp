@@ -14,7 +14,8 @@ protocol BuilderTranslateProtocol{
 final class BuilderTranslate: BuilderTranslateProtocol{
     func buildTranslateVC() -> UIViewController {
         let network = NetworkManager()
-        let viewModel = TranslateViewModel(network: network)
+        let storeManager = StoreManager()
+        let viewModel = TranslateViewModel(network: network, storeManager: storeManager)
         let vc = TranslateViewController(viewModel: viewModel)
         return vc
         

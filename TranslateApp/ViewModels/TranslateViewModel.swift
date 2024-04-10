@@ -6,44 +6,72 @@
 //
 
 import Foundation
+import Combine
 
-enum lanType{
-    case source
-    case dest
+enum LanType: String{
+    case source = "sl"
+    case dest = "dl"
 }
 
 final class TranslateViewModel: ObservableObject{
     
     @Published var dataTranslations: String = .init()
     @Published var placeHolderDest: String = .init()
+    @Published var langDict: [String : String] = .init()
+    @Published var langDictLabel: [String : String] = .init()
     
     let languages: [Languages] = Languages.allCases
-    var langDict: [String : String] = ["sl" : "", "dl" : ""]
     
     private let network: NetworkMangerProtocol
+    private let storeManager: StoreManagerProtocol
+    private var cancellables = Set<AnyCancellable>()
     
-    init(network: NetworkMangerProtocol) {
+    init(network: NetworkMangerProtocol, storeManager: StoreManagerProtocol) {
         self.network = network
-        setUpDefaultLangs()
+        self.storeManager = storeManager
+        observeData()
+        setUpSavedtLangs()
+    }
+    
+    private func observeData(){
+        $langDict
+            .dropFirst()
+            .sink { [unowned self] dict in
+                filterDictValue(dict: dict)
+            }
+            .store(in: &cancellables)
     }
     
     func translateWords(text: String){
-        let request = TranslateRequest(sourseLan: langDict["sl"] ?? "en", destLan: langDict["dl"] ?? "ru", textToTranslate: text)
+        let request = TranslateRequest(sourseLan: langDict[LanType.source.rawValue] ?? "en", destLan: langDict[LanType.dest.rawValue] ?? "ru", textToTranslate: text)
         text.isEmpty ? placeHolderDest = "Translate Word" : fetchCoctailData(request: request)
     }
     
-    func changeLanSourseOrDest(type:lanType, newlan: String){
+    func changeLanSourseOrDest(type:LanType, newlan: String){
         switch type{
         case .source:
-            langDict["sl"] = newlan
+            langDict[LanType.source.rawValue] = newlan
+            saveNewLan(lanDict: langDict)
         case .dest:
-            langDict["dl"] = newlan
+            langDict[LanType.dest.rawValue] = newlan
+            saveNewLan(lanDict: langDict)
         }
     }
+    private func setUpSavedtLangs() {
+        langDict = storeManager.getData(forKey: .languages) ?? [LanType.dest.rawValue: languages.first?.typeValue ?? "ru", LanType.source.rawValue: languages.last?.typeValue ?? "en"]
+    }
     
-    private func setUpDefaultLangs(){
-        langDict["sl"] = languages.first?.typeValue
-        langDict["dl"] = languages.last?.typeValue
+    private func saveNewLan(lanDict: [String : String]){
+        storeManager.set(langDict, forKey: .languages)
+    }
+    
+    private func filterDictValue(dict: [String : String]){
+        if let sl = languages.first(where: { $0.typeValue == dict[LanType.source.rawValue] })?.typeLabel {
+            langDictLabel[LanType.source.rawValue] = sl
+        }
+        if let dl = languages.first(where: { $0.typeValue == dict[LanType.dest.rawValue] })?.typeLabel {
+            langDictLabel[LanType.dest.rawValue] = dl
+        }
     }
     
     private func fetchCoctailData(request: TranslateRequest){
